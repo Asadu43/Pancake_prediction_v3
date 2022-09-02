@@ -8,6 +8,7 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+import "hardhat/console.sol";
 
 /**
  * @title PancakePredictionV3
@@ -224,6 +225,11 @@ contract PancakePredictionV3 is Ownable, Pausable, ReentrancyGuard {
             if (rounds[epochs[i]].oracleCalled) {
                 require(claimable(epochs[i], msg.sender), "Not eligible for claim");
                 Round memory round = rounds[epochs[i]];
+
+                console.log("Owner Amount",(ledger[epochs[i]][msg.sender].amount));
+                console.log("reward Amount",round.rewardAmount);
+                console.log("base Amount",round.rewardBaseCalAmount);
+
                 addedReward = (ledger[epochs[i]][msg.sender].amount * round.rewardAmount) / round.rewardBaseCalAmount;
             }
             // Round invalid, refund bet amount
@@ -522,8 +528,13 @@ contract PancakePredictionV3 is Ownable, Pausable, ReentrancyGuard {
         // Bull wins
         if (round.closePrice > round.lockPrice) {
             rewardBaseCalAmount = round.bullAmount;
+            console.log("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh",rewardBaseCalAmount);
             treasuryAmt = (round.totalAmount * treasuryFee) / 10000;
             rewardAmount = round.totalAmount - treasuryAmt;
+
+            console.log("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh",rewardAmount);
+
+            
         }
         // Bear wins
         else if (round.closePrice < round.lockPrice) {
